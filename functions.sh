@@ -145,25 +145,16 @@ install_docker(){
   is_ubuntu
   hi "  Installing Docker!\n"
 
-  # Check that HTTPS transport is available to APT
-  if [[ ! -e /usr/lib/apt/methods/https ]]; then
-    apt-get update -qq
-    apt-get install -qy apt-transport-https
-    echo
-  fi
-
-  # Add the repository to your APT sources
-  # Then import the repository key
-  if [[ ! -e /etc/apt/sources.list.d/docker.list ]]; then
-    echo deb https://get.docker.com/ubuntu docker main > /etc/apt/sources.list.d/docker.list
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
-    echo
-  fi
-
-  # Install docker
+ # Install docker
+ # If not found intall docker following Docker for Bionic instructions
+ # https://docs.docker.com/install/linux/docker-ce/ubuntu/
   if ! command -v docker >/dev/null 2>&1; then
     apt-get update -qq
-    apt-get install -qy --no-install-recommends lxc-docker cgroup-lite
+    apt-get install -qy apt-transport-https ca-certificates curl software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    apt-get update -qq
+    apt-get install -y docker-ce
     #apt-get install -qy lxc-docker linux-image-extra-$(uname -r) aufs-tools
   fi
 }
